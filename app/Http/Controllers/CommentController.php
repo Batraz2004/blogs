@@ -28,13 +28,13 @@ class CommentController extends Controller
 
     public function listByPost($postId, Request $request)
     {
-        /** @var User $user */
         $perPage = $request->input('per_page', 15);
 
         $comments = Comment::isParent()
             ->with('childs')
             ->where('post_id', $postId)
-            ->paginate($perPage);
+            ->orderByDesc('id')
+            ->cursorPaginate($perPage);
 
         if (blank($comments)) {
             abort(404);
@@ -51,7 +51,10 @@ class CommentController extends Controller
         $user = Auth::user();
         $perPage = $request->input('per_page', 15);
 
-        $comments = $user->comments()->paginate($perPage);
+        $comments = $user
+            ->comments()
+            ->orderByDesc('id')
+            ->cursorPaginate($perPage);
 
         return response()->json([
             'data' => CommentResource::collection($comments)->resource,

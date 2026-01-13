@@ -13,11 +13,12 @@ class PostController extends Controller
 {
     public function list(Request $request)
     {
-        $perPage = $request->input('per_page', 5);
+        $perPage = $request->input('per_page', 15);
 
         $posts = Post::query()
             ->with('user')
-            ->paginate($perPage);
+            ->orderByDesc('id')
+            ->cursorPaginate($perPage);
 
         return response()->json([
             'data' => PostResource::collection($posts)->resource,
