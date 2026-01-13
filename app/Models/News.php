@@ -10,6 +10,15 @@ class News extends Model
 {
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::deleting(function ($news) {
+            $news->comments()->each(function ($comment) {
+                $comment->delete();
+            });
+        });
+    }
+
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');

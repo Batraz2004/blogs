@@ -17,6 +17,15 @@ class Post extends Model implements HasMedia
 
     protected $guarded = [];
 
+    protected static function booted()
+    {
+        static::deleting(function ($post) {
+            $post->comments()->each(function ($comment) {
+                $comment->delete();
+            });
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
