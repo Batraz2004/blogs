@@ -57,3 +57,115 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## blogs api app =)
+Приложение по созданию постов с видео а также коментариев
+
+## Технологии
+- PHP 8.4
+- Laravel 12
+- mysql 8.0.44
+
+## пакеты
+- auth sanctum для аутентификации
+- media library от spatie для сохранения видео
+
+## api endpoints
+
+### регистрация
+```http
+POST api/registration/
+{
+    "email": почта,
+    "name": имя,
+    "password": пароль
+    "password_confirmation": подтверждение пароля
+}
+```
+
+### авторизация
+```http
+POST api/login/
+{
+    "email": почта,
+    "password": пароль
+    "password_confirmation": подтверждение пароля
+}
+```
+
+### выход
+```http
+POST api/logout/
+{}
+```
+
+### создание поста
+```http
+POST api/post/
+{
+    "title": заголовок,
+    "text": описание,
+    "video": файл видео
+}
+```
+### обновление поста
+```http
+POST api/post/<id поста>
+{
+    "title": заголовок,
+    "text": описание,
+    "video": файл видео
+}
+```
+
+### получение поста по id
+```http
+GET api/post/<id поста>
+{}
+```
+
+### список постов(с пагинацией)
+```http
+GET api/post/?per_page=15
+{}
+```
+
+### удаление поста
+```http
+DELETE api/post/<id поста>
+{}
+```
+
+### создание коментария
+```http
+POST api/comment
+{
+    "message": сообщение,
+    "post_id": к какому посту,
+}
+```
+
+### обновление коментария
+```http
+POST api/comment/<id коментария>
+{
+    "message": сообщение,
+}
+```
+
+### удаление коментария
+```http
+DELETE api/comment/6
+{}
+```
+
+### список коментариев по посту(с пагинацией)
+```http
+GET api/comment/post/<id поста>
+{}
+
+### список коментариев текущего пользователя(с пагинацией)
+```http
+GET api/comment/user
+{}
+```
