@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\LoginRequest;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+class LoginController extends Controller
+{
+    public function login(LoginRequest $request)
+    {
+        $tokenName = $request->header("user-agent");
+
+        $user = User::query()->firstWhere('email', $request->email);
+
+        if (blank($user) || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'не верный email или пароль'], 200);
+        }
+
+        $result = DB::transaction(function () use ($user, $tokenName) {
+            $query = $user->tokens();
+            $query->where('name', $tokenName);
+            $query->delete();
+            $token = $user->createToken($tokenName)->plainTextToken;
+
+            $user->remember_token = Hash::make($token);
+            $user->save();
+
+            return $token;
+        });
+
+        if ($result)
+            return response()->json(['message' => 'пользователь авторизован', 'token' => $result], 200);
+        else
+            return response()->json(['message' => 'не удалось авторизоваться', 'token' => $result], 200);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(['code' => 200, 'mess' => 'выход из аккаунта'], 200);
+    }
+}
