@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -16,7 +14,6 @@ class PostController extends Controller
         $perPage = $request->input('per_page', 15);
 
         $posts = Post::query()
-            ->with('user')
             ->orderByDesc('id')
             ->cursorPaginate($perPage);
 
@@ -27,14 +24,7 @@ class PostController extends Controller
 
     public function create(PostRequest $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
-        $post = Post::query()->create([
-            'title' => $request->title,
-            'text' => $request->text,
-            'user_id' => $user->id,
-        ]);
+        $post = Post::query()->create($request->getData());
 
         $post->addMedia($request->video)->toMediaCollection('blog-videos');
 
@@ -47,24 +37,13 @@ class PostController extends Controller
 
     public function update($postId, PostRequest $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
-        /** @var Post $post */
-        $post = $user
-            ->posts()
-            ->find($postId);
+        $post = Post::query()->find($postId);
 
         if (blank($post)) {
             abort(404);
         }
 
-        $post->update([
-            'title' => $request->title,
-            'text' => $request->text,
-        ]);
-
-        $post->load('user');
+        $post->update($request->getData());
 
         $post->deleteAllMedia();
         $post->addMedia($request->video)->toMediaCollection('blog-videos');
@@ -83,8 +62,6 @@ class PostController extends Controller
             abort(404);
         }
 
-        $post->load('user');
-
         return response()->json([
             'data' => PostResource::make($post),
         ], 200);
@@ -92,12 +69,7 @@ class PostController extends Controller
 
     public function delete($postId)
     {
-        /** @var User $user */
-        $user = Auth::user();
-
-        $post = $user
-            ->posts()
-            ->find($postId);
+        $post = Post::query()->find($postId);
 
         if (blank($post)) {
             abort(404);

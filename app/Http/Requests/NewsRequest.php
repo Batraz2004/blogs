@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostRequest extends FormRequest
+class NewsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,6 @@ class PostRequest extends FormRequest
         return [
             'title' => ['required'],
             'description' => ['required'],
-            'video' => ['file', 'required', 'mimes:mkv,avi,mp4,mov,wmv,flv,webm', 'max:102400'],
         ];
     }
 

@@ -104,7 +104,7 @@ POST api/logout/
 POST api/post/
 {
     "title": заголовок,
-    "text": описание,
+    "description": описание,
     "video": файл видео
 }
 ```
@@ -113,7 +113,7 @@ POST api/post/
 POST api/post/<id поста>
 {
     "title": заголовок,
-    "text": описание,
+    "description": описание,
     "video": файл видео
 }
 ```
@@ -133,6 +133,42 @@ GET api/post/?per_page=15
 ### удаление поста
 ```http
 DELETE api/post/<id поста>
+{}
+```
+
+### создание новости
+```http
+POST api/news/
+{
+    "title": заголовок,
+    "description": описание,
+}
+```
+
+### обновление новости
+```http
+POST api/news/<id новости>
+{
+    "title": заголовок,
+    "description": описание,
+}
+```
+
+### получение новости по id
+```http
+GET api/news/<id новости>
+{}
+```
+
+### список новостей(с пагинацией)
+```http
+GET api/news/?per_page=15
+{}
+```
+
+### удаление новости
+```http
+DELETE api/news/<id новости>
 {}
 ```
 
@@ -163,6 +199,19 @@ DELETE api/comment/6
 ```http
 GET api/comment/post/<id поста>
 {}
+```
+
+### список коментариев текущего пользователя(с пагинацией)
+```http
+GET api/comment/user
+{}
+```
+
+### список коментариев к новостям(с пагинацией)
+```http
+GET api/comment/news/<id новости>
+{}
+```
 
 ### список коментариев текущего пользователя(с пагинацией)
 ```http
