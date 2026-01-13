@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CommentCreateRequest;
 use App\Http\Requests\CommentToNewsCreateRequest;
 use App\Http\Requests\CommentToPostCreateRequest;
 use App\Http\Requests\CommentUpdateRequest;

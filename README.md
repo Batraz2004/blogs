@@ -171,13 +171,21 @@ GET api/news/?per_page=15
 DELETE api/news/<id новости>
 {}
 ```
-
-### создание коментария
+### создание коментария для поста
 ```http
-POST api/comment
+POST api/comment/post
 {
     "message": сообщение,
     "post_id": к какому посту,
+}
+```
+
+### создание коментария для новости
+```http
+POST api/comment/news
+{
+    "message": сообщение,
+    "news_id": к какой новости,
 }
 ```
 
