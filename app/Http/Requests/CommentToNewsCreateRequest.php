@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\News;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class CommentCreateRequest extends FormRequest
+class CommentToNewsCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,13 +25,21 @@ class CommentCreateRequest extends FormRequest
     {
         return [
             'message' => ['required'],
-            'post_id' => ['required', 'exists:posts,id'],
+            'news_id' => ['required', 'exists:news,id'],
             'parent_id' => ['nullable','exists:comments,id'],
         ];
     }
 
     public function getData(): array
     {
-        return $this->only(['message', 'post_id', 'parent_id']);
+        $data = [
+            'message' => $this->message,
+            'parent_id' => $this->parent_id,
+            'commentable_type' => News::class,
+            'commentable_id' => $this->news_id,
+            'user_id' => Auth::id(),
+        ];
+
+        return $data;
     }
 }

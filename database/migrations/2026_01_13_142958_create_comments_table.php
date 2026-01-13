@@ -25,10 +25,8 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
-            $table->foreignId('post_id')
-                ->constrained()
-                ->cascadeOnDelete()
-                ->cascadeOnUpdate();
+
+            $table->morphs('commentable');
 
             $table->timestamps();
         });
