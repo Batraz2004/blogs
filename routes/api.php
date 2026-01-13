@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RegistrationController;
@@ -22,5 +23,15 @@ Route::prefix('post')->middleware('auth:sanctum')->group(function () {
         Route::post('/', [PostController::class, 'update']);
         Route::get('/', [PostController::class, 'get']);
         Route::delete('/', [PostController::class, 'delete']);
+    });
+});
+
+Route::prefix('comment')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [CommentController::class, 'create']);
+    Route::get('list/user', [CommentController::class, 'listByUser']);
+    Route::get('post/{postId}', [CommentController::class, 'listByPost']);
+    Route::prefix('{commentId}')->group(function () {
+        Route::post('/', [CommentController::class, 'update']);
+        Route::delete('/', [CommentController::class, 'delete']);
     });
 });
