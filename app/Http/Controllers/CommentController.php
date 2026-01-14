@@ -10,16 +10,16 @@ use App\Models\Comment;
 use App\Models\News;
 use App\Models\Post;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\CursorPaginator;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
     public function createToPost(CommentToPostCreateRequest $request)
     {
-        $comment = Comment::query()->create($request->getData());
-
-        $comment->load('commentable');
+        $comment = $this->createComment($request);
 
         return response()->json([
             'data' => CommentResource::make($comment),
@@ -28,13 +28,20 @@ class CommentController extends Controller
 
     public function createToNews(CommentToNewsCreateRequest $request)
     {
-        $comment = Comment::query()->create($request->getData());
-
-        $comment->load('commentable');
+        $comment = $this->createComment($request);
 
         return response()->json([
             'data' => CommentResource::make($comment),
         ], 200);
+    }
+
+    private function createComment(CommentToNewsCreateRequest|CommentToPostCreateRequest $request): Comment
+    {
+        $comment = Comment::query()->create($request->getData());
+
+        $comment->load('commentable');
+
+        return $comment;
     }
 
     public function listByPost($postId, Request $request)
@@ -43,21 +50,12 @@ class CommentController extends Controller
             abort(404);
         }
 
-        $perPage = $request->input('per_page', 15);
+        $commentable = Post::class;
 
-        $comments = Comment::isParent()
-            ->with('childs')
-            ->where('commentable_type', Post::class)
-            ->where('commentable_id', $postId)
-            ->orderByDesc('id')
-            ->cursorPaginate($perPage);
-
-        if (blank($comments)) {
-            abort(404);
-        }
+        $comments = $this->commentsList($commentable, $postId, $request);
 
         return response()->json([
-            'data' => CommentResource::collection($comments)->resource,
+            'data' => $comments,
         ], 200);
     }
 
@@ -67,22 +65,27 @@ class CommentController extends Controller
             abort(404);
         }
 
+        $commentable = News::class;
+
+        $comments = $this->commentsList($commentable, $newsId, $request);
+
+        return response()->json([
+            'data' => $comments,
+        ], 200);
+    }
+
+    private function commentsList(string $commentable, $id, $request): CursorPaginator
+    {
         $perPage = $request->input('per_page', 15);
 
         $comments = Comment::isParent()
             ->with('childs')
-            ->where('commentable_type', News::class)
-            ->where('commentable_id', $newsId)
+            ->where('commentable_type', $commentable)
+            ->where('commentable_id', $id)
             ->orderByDesc('id')
             ->cursorPaginate($perPage);
 
-        if (blank($comments)) {
-            abort(404);
-        }
-
-        return response()->json([
-            'data' => CommentResource::collection($comments)->resource,
-        ], 200);
+        return $comments;
     }
 
     public function listByUser(Request $request)

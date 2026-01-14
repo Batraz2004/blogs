@@ -45,7 +45,6 @@ class PostController extends Controller
 
         $post->update($request->getData());
 
-        $post->deleteAllMedia();
         $post->addMedia($request->video)->toMediaCollection('blog-videos');
 
         return response()->json([
